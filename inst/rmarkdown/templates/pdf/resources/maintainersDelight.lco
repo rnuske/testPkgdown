@@ -1,0 +1,134 @@
+\ProvidesFile{maintainersDelight.lco}[letter class options to maintainers delight] % loosely follows DIN 5008B
+
+\LoadLetterOption{DIN} % the default but let's be explicit about our foundation
+
+
+% Options  --------------------------------------------------------------------
+\KOMAoptions{%
+  parskip=half,              % half line skip between paragraphs
+  firstfoot=false,           % no footer
+  enlargefirstpage,          % longer first page works well with no footer
+  refline=narrow,            % adjust refline with text body
+  backaddress=plain          % do not underline backaddress in address window
+}
+
+
+% Fonts, Icons and Colors -----------------------------------------------------
+\renewcommand{\familydefault}{\sfdefault}  % sans serif font for entire letter
+\usepackage{lmodern}
+
+\usepackage{marvosym}                      % icons
+\usepackage[dvipsnames]{xcolor}            % custom colors
+\usepackage{ragged2e}                      % aligned AND correctly hyphenated
+
+\setkomafont{backaddress}{\fontsize{8pt}{8pt}\selectfont}
+\setkomafont{refname}{\fontsize{8pt}{8pt}\selectfont}
+\setkomafont{refvalue}{\fontsize{10pt}{10pt}\selectfont}
+\setkomafont{foldmark}{\color[gray]{0.50}}
+
+% with ideas from https://tex.stackexchange.com/a/550095/218581 https://tex.stackexchange.com/a/550178/218581 https://tex.stackexchange.com/a/78919/218581
+\newcommand*{\addverythinspace}{\hskip0.02083em\relax}
+\setkomavar{backaddressseparator}{\nobreak\addverythinspace\textperiodcentered\addverythinspace}
+\setkomavar{backaddress}{\parbox[c]{\useplength{toaddrwidth}}{%
+{\def\\{\usekomavar{backaddressseparator}\@ogobble}%
+\usekomavar{fromname}\usekomavar{backaddressseparator}\usekomavar{fromaddress}}%
+\RaggedRight%
+}}
+
+
+% Layout ----------------------------------------------------------------------
+% Text block
+\areaset{160mm}{237mm}                           % width and height of textarea
+\setlength{\oddsidemargin}{\dimexpr 30mm-1in}    % left margin  30mm
+\setlength{\evensidemargin}{\dimexpr 20mm-1in}   % right margin 20mm
+
+% Letter Head
+\@setplength{firstheadhpos}{30mm}
+\@setplength{firstheadvpos}{17mm}
+\@setplength{firstheadwidth}{\textwidth}
+
+% Address Window
+\@setplength{toaddrhpos}{30mm}
+\@setplength{toaddrvpos}{45mm}
+\@setplength{toaddrwidth}{75mm}
+\@setplength{toaddrheight}{45mm}
+\@setplength{toaddrindent}{0mm}
+\@setplength{backaddrheight}{16pt}
+
+% Foldmarks
+\@setplength{foldmarkhpos}{5mm}
+
+% Reference line
+\@setplength{refvpos}{94mm}
+\@setplength{refaftervskip}{8.46mm}
+
+% Signature
+\let\raggedsignature\raggedright
+
+
+% Custom Letter Head ----------------------------------------------------------
+\setkomavar{firsthead}{%
+  \parbox{\useplength{firstheadwidth}}{%
+    \raggedleft%
+    \ifkomavarempty{fromname}{}{{\fontsize{24pt}{24pt}\bfseries\color[gray]{0.33}\usekomavar{fromname}}\\\vspace{2mm}}
+    {%
+      \fontsize{10pt}{12pt}\selectfont\color[gray]{0.33}%
+      \ifkomavarempty{fromaddress}{}{{\def\\{,\nobreakspace\@ogobble}\usekomavar{fromaddress}}~\Letter\\}%
+      \ifkomavarempty{fromemail}{}{\usekomavar{fromemail}~\MVAt\\}%
+      \ifkomavarempty{fromphone}{}{\usekomavar{fromphone}~\Telefon\\}%
+      \ifkomavarempty{fromurl}{}{\usekomavar{fromurl}~\Mundus\\}%
+    }
+  }
+}
+
+
+
+% Hack to provide sections ----------------------------------------------------
+% The class scrlttr2 has no sections!
+% Inspired by deprecated `sections.lco` https://komascript.de/sections.lco
+% Markus Kohm now recommends to use class `scrartcl` with package `scrletter`.
+% Example: https://tex.stackexchange.com/a/464722
+
+% Counter
+\newcounter{section}
+\renewcommand*{\thesection}{\@arabic\c@section}
+\newcommand*\sectionmarkformat{\thesection\autodot\enskip}
+\newcounter{subsection}[section]
+\renewcommand*{\thesubsection}{\thesection.\@arabic\c@subsection}
+\newcommand*\subsectionmarkformat{\thesubsection\autodot\enskip}
+\newcounter{subsubsection}[subsection]
+\renewcommand*{\thesubsubsection}{\thesubsection.\@arabic\c@subsubsection}
+\setcounter{secnumdepth}{3}
+
+% Sections
+% \@startsection{name}{level}{indent}{beforeskip}{afterskip}{style}
+% beforeskip and afterskip are parskip + given length
+\newcommand\section{\@startsection{section}{1}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -0.2ex}%
+  {0.5ex \@plus .1ex \@minus .1ex}%
+  {\normalcolor\sffamily\bfseries\normalsize}}
+\newcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-1.5ex \@plus -0.1ex \@minus -0.1ex}%
+  {1sp}% smallest possible length almost zero => results in one parskip
+  {\normalcolor\sffamily\bfseries\normalsize}}
+\newcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+  {-1.0ex \@plus -0.1ex \@minus -0.1ex}%
+  {0.1ex}%
+  {\normalcolor\sffamily\bfseries\normalsize}}
+
+% hack to get rid of parskip after subsubsection line
+% https://tex.stackexchange.com/a/324346/218581
+\let\origsubsubsection\subsubsection
+\renewcommand\subsubsection[2][\relax]{%
+  \ifx\relax#1\origsubsubsection{#2}\else\origsubsubsection[#1]{#2}\fi%
+  \vspace{-\parskip}}
+
+% Alternatives:
+% https://tex.stackexchange.com/a/318005/218581
+% not chosen because of version dependency and dependency on another package
+% 1) runin
+%  KOMA-Script >= 3.26 (on CTAN since 2019-01-04) provides option runin to
+%  \DeclareSectionCommand etc. allowing for negative length in afterskip
+% 2) xpatch
+%  \usepackage{xpatch}
+%  \xapptocmd\sectionlinesformat{\vspace*{-\parskip}}{}{\PatchFailed}

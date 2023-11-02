@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.drone\.yml$
+^\.gitattributes$
+^cran-comments\.md$
+^\.github$
+^docs$
+^pkgdown$
+^_pkgdown\.yml$
+^vignettes/pkgdown_
+^vignettes/intermediate.Rmd$
